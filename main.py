@@ -4,6 +4,7 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from multiprocessing import Pool, cpu_count
 from string import punctuation
+from nltk.stem import WordNetLemmatizer
 
 pd.set_option('display.max_colwidth', None)
 
@@ -16,6 +17,11 @@ try:
     nltk.data.find('corpora/stopwords')
 except LookupError:
     nltk.download('stopwords')
+    
+try:
+    nltk.data.find('corpora/wordnet')
+except LookupError:
+    nltk.download('wordnet')
 
 def tokenize_chunk(chunk):
     chunk['Tokenized_Plot'] = chunk['Plot'].apply(word_tokenize)
@@ -26,6 +32,7 @@ class MovieGenreClassifier:
         dataset = pd.read_csv(data_path)
         columns_to_keep = ['Genre', 'Plot']
         self.data = dataset[columns_to_keep]
+        self.lemmatizer = WordNetLemmatizer()
         
     def processDataset(self):
         print("Processing dataset...")
@@ -51,7 +58,7 @@ class MovieGenreClassifier:
         # Remove stop words
         stop_words = set(stopwords.words('english'))
         words = word_tokenize(text)
-        words = [word.lower() for word in words if word.lower() not in stop_words]
+        words = [self.lemmatizer.lemmatize(word.lower()) for word in words if word.lower() not in stop_words]
         
         return ' '.join(words)
     
