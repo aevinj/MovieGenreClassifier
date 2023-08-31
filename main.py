@@ -5,7 +5,12 @@ from nltk.corpus import stopwords
 from multiprocessing import Pool, cpu_count
 from string import punctuation
 from nltk.stem import WordNetLemmatizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 
+
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+pd.set_option('display.width', None)
 pd.set_option('display.max_colwidth', None)
 
 try:
@@ -33,6 +38,7 @@ class MovieGenreClassifier:
         columns_to_keep = ['Genre', 'Plot']
         self.data = dataset[columns_to_keep]
         self.lemmatizer = WordNetLemmatizer()
+        self.vectorizer = TfidfVectorizer(max_features=1000)
         
     def processDataset(self):
         print("Processing dataset...")
@@ -40,7 +46,6 @@ class MovieGenreClassifier:
         self.data.drop_duplicates(inplace=True) #remove duplicates
         self.data.dropna(inplace=True)  #remove empty values
         
-        print("Preprocessing plot text...")
         self.data['Plot'] = self.data['Plot'].apply(self.preprocess_text)
         
         print("Tokenizing dataset...")
@@ -49,13 +54,16 @@ class MovieGenreClassifier:
         
         with Pool(num_cores) as pool:
             self.data = pd.concat(pool.map(tokenize_chunk, [self.data[i:i+chunk_size] for i in range(0, len(self.data), chunk_size)]))
-        print("Done...\n ")
+        
+        print("Feature extraction...")
+        self.TFIDFMatrix = self.vectorizer.fit_transform(self.data['Tokenized_Plot'].apply(lambda x: ' '.join(x))).toarray()
     
     def preprocess_text(self, text):
         # Remove punctuation
         text = ''.join([char for char in text if char not in punctuation])
         
         # Remove stop words
+        print("Removing stop words and lemmatizing...")
         stop_words = set(stopwords.words('english'))
         words = word_tokenize(text)
         words = [self.lemmatizer.lemmatize(word.lower()) for word in words if word.lower() not in stop_words]
