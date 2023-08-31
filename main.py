@@ -6,6 +6,10 @@ from multiprocessing import Pool, cpu_count
 from string import punctuation
 from nltk.stem import WordNetLemmatizer
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
 
 
 pd.set_option('display.max_rows', None)
@@ -46,6 +50,7 @@ class MovieGenreClassifier:
         self.data.drop_duplicates(inplace=True) #remove duplicates
         self.data.dropna(inplace=True)  #remove empty values
         
+        print("Removing stop words and lemmatizing...")
         self.data['Plot'] = self.data['Plot'].apply(self.preprocess_text)
         
         print("Tokenizing dataset...")
@@ -57,25 +62,44 @@ class MovieGenreClassifier:
         
         print("Feature extraction...")
         self.TFIDFMatrix = self.vectorizer.fit_transform(self.data['Tokenized_Plot'].apply(lambda x: ' '.join(x))).toarray()
+
+        label_encoder = LabelEncoder()
+        self.data['Encoded_Genre'] = label_encoder.fit_transform(self.data['Genre'])
+
+        # Train-Test Split
+        X_train, X_test, y_train, y_test = train_test_split(
+            self.TFIDFMatrix, self.data['Encoded_Genre'],
+            test_size=0.2, random_state=42
+        )
+
+        trained_model = self.trainModel(X_train, y_train)
+        self.evaluateModel(trained_model, X_test, y_test)
     
     def preprocess_text(self, text):
         # Remove punctuation
         text = ''.join([char for char in text if char not in punctuation])
         
         # Remove stop words
-        print("Removing stop words and lemmatizing...")
         stop_words = set(stopwords.words('english'))
         words = word_tokenize(text)
         words = [self.lemmatizer.lemmatize(word.lower()) for word in words if word.lower() not in stop_words]
         
         return ' '.join(words)
     
-    def printFirstFew(self):
-        print(self.data.head(1))
+    def trainModel(self, X_train, y_train):
+        print("Training the model...")
+        model = LogisticRegression(max_iter=100)  # You can adjust hyperparameters
+        model.fit(X_train, y_train)
+        return model
+
+    def evaluateModel(self, model, X_test, y_test):
+        print("Evaluating the model...")
+        y_pred = model.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+        print("Accuracy:", accuracy)
 
 if __name__ == "__main__":
     data_path = 'C:/Users/aevin/Desktop/wiki_movie_plots_deduped.csv'
     movie_classifier = MovieGenreClassifier(data_path)
     movie_classifier.processDataset()
-    movie_classifier.printFirstFew()
     
