@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Movie Genre Classifier</title>
+</head>
+<body>
+    <h1>Welcome to the Movie Genre Classifier</h1>
+    <p>Enter a movie description to predict its genre:</p>
+    <form method="post" action="{% url 'predictor' %}">
+        {% csrf_token %}
+        <input type="text" name="user_input">
+        <button type="submit">Predict Genre</button>
+    </form>
+</body>
+</html>
