@@ -33,13 +33,13 @@ Firstly, the user must have Python and pip installed on their machine. From ther
 
 These can be installed by running:
 
-pip install -r requirements.txt
+***pip install -r requirements.txt***
 
 or alternatively,
 
 Each can be installed by running the following line in the terminal: 
 
-pip install [enter library] .
+***pip install [enter library] .***
 
 ## Usage
 
