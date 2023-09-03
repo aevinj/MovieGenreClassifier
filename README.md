@@ -44,9 +44,20 @@ Each can be installed by running the following line in the terminal:
 
 ## Usage
 
+Text-Based format:
+
 ![image](https://github.com/aevinj/MovieGenreClassifier/assets/64698098/5702a3e8-5c87-4f3a-82dd-52049cb76c68)
 
 ![image](https://github.com/aevinj/MovieGenreClassifier/assets/64698098/aa05fb8e-693b-4c4f-8b40-511cd6afa4b1)
+
+Django hosted format:
+
+![image](https://github.com/aevinj/MovieGenreClassifier/assets/64698098/afc91427-fd7a-4834-949f-a33d88385ad9)
+
+![image](https://github.com/aevinj/MovieGenreClassifier/assets/64698098/dd6a78ce-3ce5-403b-818b-2ee9d3a187de)
+
+![image](https://github.com/aevinj/MovieGenreClassifier/assets/64698098/9f9aefee-6329-4d9d-827d-a99d6402a528)
+
 
 ## Technologies Used
 
