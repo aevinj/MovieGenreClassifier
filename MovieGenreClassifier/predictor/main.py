@@ -1,23 +1,17 @@
-import pandas as pd
+#import pandas as pd
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-from multiprocessing import Pool, cpu_count
+#from multiprocessing import Pool, cpu_count
 from string import punctuation
 from nltk.stem import WordNetLemmatizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import LabelEncoder
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
+#from sklearn.model_selection import train_test_split
+#from sklearn.linear_model import LogisticRegression
+#from sklearn.metrics import accuracy_score
 import joblib
 import os
-
-
-pd.set_option('display.max_rows', None)
-pd.set_option('display.max_columns', None)
-pd.set_option('display.width', None)
-pd.set_option('display.max_colwidth', None)
 
 try:
     nltk.data.find('tokenizers/punkt')
@@ -46,11 +40,12 @@ class MovieGenreClassifier:
         self.lemmatizer = WordNetLemmatizer()
         self.vectorizer = TfidfVectorizer(max_features=1000)
         self.label_encoder = LabelEncoder()
-        if not (os.path.exists(os.path.join('predictor', 'model', 'trained_model.pkl')) and os.path.exists(os.path.join('predictor', 'model', 'tfidf_vectorizer.pkl')) and os.path.exists(os.path.join('predictor', 'model', 'label_encoder.pkl'))):
-            self.processDataset()
-        else:
-            print("Existing model found...")
-            self.load_trained_model()
+        # if not (os.path.exists(os.path.join('predictor', 'model', 'trained_model.pkl')) and os.path.exists(os.path.join('predictor', 'model', 'tfidf_vectorizer.pkl')) and os.path.exists(os.path.join('predictor', 'model', 'label_encoder.pkl'))):
+        #     self.processDataset()
+        # else:
+        #     print("Existing model found...")
+        #     self.load_trained_model()
+        self.load_trained_model()
         
     def load_trained_model(self):
         self.trained_model = joblib.load(os.path.join('predictor', 'model', 'trained_model.pkl'))
@@ -59,33 +54,33 @@ class MovieGenreClassifier:
         # Finally load the label encoder
         self.label_encoder = joblib.load(os.path.join('predictor', 'model', 'label_encoder.pkl'))
     
-    def processDataset(self):
-        print("Processing dataset...")
-        self.data = self.data[self.data['Genre'] != 'unknown']
+    # def processDataset(self):
+    #     print("Processing dataset...")
+    #     self.data = self.data[self.data['Genre'] != 'unknown']
         
-        print("Removing stop words and lemmatizing...")
-        self.data['Plot'] = self.data['Plot'].apply(self.preprocess_text)
+    #     print("Removing stop words and lemmatizing...")
+    #     self.data['Plot'] = self.data['Plot'].apply(self.preprocess_text)
         
-        print("Tokenizing dataset...")
-        num_cores = cpu_count()
-        chunk_size = len(self.data) // num_cores
+    #     print("Tokenizing dataset...")
+    #     num_cores = cpu_count()
+    #     chunk_size = len(self.data) // num_cores
         
-        with Pool(num_cores) as pool:
-            self.data = pd.concat(pool.map(tokenize_chunk, [self.data[i:i+chunk_size] for i in range(0, len(self.data), chunk_size)]))
+    #     with Pool(num_cores) as pool:
+    #         self.data = pd.concat(pool.map(tokenize_chunk, [self.data[i:i+chunk_size] for i in range(0, len(self.data), chunk_size)]))
         
-        print("Feature extraction...")
-        self.TFIDFMatrix = self.vectorizer.fit_transform(self.data['Tokenized_Plot'].apply(lambda x: ' '.join(x))).toarray()
+    #     print("Feature extraction...")
+    #     self.TFIDFMatrix = self.vectorizer.fit_transform(self.data['Tokenized_Plot'].apply(lambda x: ' '.join(x))).toarray()
 
-        self.data['Encoded_Genre'] = self.label_encoder.fit_transform(self.data['Genre'])
+    #     self.data['Encoded_Genre'] = self.label_encoder.fit_transform(self.data['Genre'])
 
-        # Train-Test Split
-        X_train, X_test, y_train, y_test = train_test_split(
-            self.TFIDFMatrix, self.data['Encoded_Genre'],
-            test_size=0.2, random_state=42
-        )
+    #     # Train-Test Split
+    #     X_train, X_test, y_train, y_test = train_test_split(
+    #         self.TFIDFMatrix, self.data['Encoded_Genre'],
+    #         test_size=0.2, random_state=42
+    #     )
 
-        trained_model = self.trainModel(X_train, y_train)
-        self.evaluateModel(trained_model, X_test, y_test)
+    #     trained_model = self.trainModel(X_train, y_train)
+    #     self.evaluateModel(trained_model, X_test, y_test)
     
     def preprocess_text(self, text):
         # Remove punctuation
@@ -98,21 +93,21 @@ class MovieGenreClassifier:
         
         return ' '.join(words)
     
-    def trainModel(self, X_train, y_train):
-        print("Training the model...")
-        model = LogisticRegression(max_iter=100)  # You can adjust hyperparameters
-        model.fit(X_train, y_train)
-        self.trained_model = model
-        joblib.dump(model, os.path.join('predictor', 'model', 'trained_model.pkl'))
-        joblib.dump(self.vectorizer, os.path.join('predictor', 'model', 'tfidf_vectorizer.pkl'))
-        joblib.dump(self.label_encoder, os.path.join('predictor', 'model', 'label_encoder.pkl'))
-        return model
-
-    def evaluateModel(self, model, X_test, y_test):
-        print("Evaluating the model...")
-        y_pred = model.predict(X_test)
-        accuracy = accuracy_score(y_test, y_pred)
-        print("Accuracy:", accuracy)
+    #def trainModel(self, X_train, y_train):
+    #    print("Training the model...")
+    #    model = LogisticRegression(max_iter=100)  # You can adjust hyperparameters
+    #    model.fit(X_train, y_train)
+    #    self.trained_model = model
+    #    joblib.dump(model, os.path.join('predictor', 'model', 'trained_model.pkl'))
+    #    joblib.dump(self.vectorizer, os.path.join('predictor', 'model', 'tfidf_vectorizer.#pkl'))
+    #    joblib.dump(self.label_encoder, os.path.join('predictor', 'model', 'label_encoder.#pkl'))
+    #    return model
+#
+    #def evaluateModel(self, model, X_test, y_test):
+    #    print("Evaluating the model...")
+    #    y_pred = model.predict(X_test)
+    #    accuracy = accuracy_score(y_test, y_pred)
+    #    print("Accuracy:", accuracy)
     
     def predict_genre(self, input_plot = "In this uproarious film a bachelor party in Las Vegas spirals into a wild and unforgettable adventure. When three friends wake up with no memory of the previous night, they must retrace their steps to find their missing groom-to-be. Hilarity ensues as they encounter eccentric characters, unexpected challenges, and a trail of chaos that threatens to derail the upcoming wedding. With the clock ticking, the trio races against time to piece together the puzzle of their night of debauchery. Filled with outrageous antics and laugh-out-loud moments, this film showcases the unpredictable nature of friendship and the joys of embracing the unexpected."):
         preprocessed_plot = self.preprocess_text(input_plot)
