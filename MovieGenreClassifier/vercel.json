@@ -1,0 +1,14 @@
+{
+    "builds": [
+      {
+        "src": "MovieGenreClassifier/wsgi.py",
+        "use": "@vercel/python"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "MovieGenreClassifier/wsgi.py"
+      }
+    ]
+}
