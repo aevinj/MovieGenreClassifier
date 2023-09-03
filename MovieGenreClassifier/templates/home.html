@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Movie Genre Classifier</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 16px;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-size: 16px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #validation-message {
+            color: red;
+        }
+
+        button[type="submit"] {
+            margin-top: 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the Movie Genre Classifier</h1>
+    <p>Would you like to use your custom plot to test the model? (default is a comedy)</p>
+    <form method="post" action="{% url 'predictor' %}">
+        {% csrf_token %}
+        <input type="checkbox" id="custom-plot" name="custom_plot_option">
+        <label for="custom-plot">Use custom plot</label>
+        <br>
+        <input type="text" name="user_input" placeholder="Enter your plot here" id="custom-plot-input" style="display:none;">
+        <span id="validation-message"></span>
+        <button type="submit">Predict Genre</button>
+    </form>
+    <script>
+        const customPlotInput = document.getElementById('custom-plot-input');
+        const customPlotCheckbox = document.getElementById('custom-plot');
+        const validationMessage = document.getElementById('validation-message');
+    
+        customPlotCheckbox.addEventListener('change', function() {
+            customPlotInput.style.display = this.checked ? 'block' : 'none';
+            validationMessage.textContent = ''; // Clear any previous validation message
+        });
+    
+        document.querySelector('form').addEventListener('submit', function(event) {
+            if (customPlotCheckbox.checked) { // Check if the custom plot checkbox is checked
+                const userInput = customPlotInput.value.trim();
+                const wordCount = userInput.split(/\s+/).length;
+    
+                if (wordCount < 50) {
+                    event.preventDefault(); // Prevent form submission
+                    validationMessage.textContent = 'Please enter at least 50 words.';
+                    customPlotInput.focus(); // Set focus back to the input field
+                }
+            }
+        });
+    </script>
+</body>
+</html>

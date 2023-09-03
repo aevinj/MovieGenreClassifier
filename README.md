@@ -30,6 +30,7 @@ Firstly, the user must have Python and pip installed on their machine. From ther
 - nltk
 - scikit-learn
 - pandas
+- django
 
 These can be installed by running:
 
@@ -56,6 +57,7 @@ Libraries:
  - pandas
  - nltk
  - sci-kit
+ - django
 
 ## Contributing
 
