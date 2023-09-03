@@ -40,24 +40,24 @@ def tokenize_chunk(chunk):
 
 class MovieGenreClassifier:
     def __init__(self):    
-        dataset = pd.read_csv('wiki_movie_plots_deduped.csv')
+        #dataset = pd.read_csv('wiki_movie_plots_deduped.csv')
         columns_to_keep = ['Genre', 'Plot']
-        self.data = dataset[columns_to_keep]
+        #self.data = dataset[columns_to_keep]
         self.lemmatizer = WordNetLemmatizer()
         self.vectorizer = TfidfVectorizer(max_features=1000)
         self.label_encoder = LabelEncoder()
-        if not (os.path.exists(os.path.join('model', 'trained_model.pkl')) and os.path.exists(os.path.join('model', 'tfidf_vectorizer.pkl')) and os.path.exists(os.path.join('model', 'label_encoder.pkl'))):
+        if not (os.path.exists(os.path.join('predictor', 'model', 'trained_model.pkl')) and os.path.exists(os.path.join('predictor', 'model', 'tfidf_vectorizer.pkl')) and os.path.exists(os.path.join('predictor', 'model', 'label_encoder.pkl'))):
             self.processDataset()
         else:
             print("Existing model found...")
             self.load_trained_model()
         
     def load_trained_model(self):
-        self.trained_model = joblib.load(os.path.join('model', 'trained_model.pkl'))
+        self.trained_model = joblib.load(os.path.join('predictor', 'model', 'trained_model.pkl'))
         # Load the TF-IDF vectorizer as well
-        self.vectorizer = joblib.load(os.path.join('model', 'tfidf_vectorizer.pkl'))
+        self.vectorizer = joblib.load(os.path.join('predictor', 'model', 'tfidf_vectorizer.pkl'))
         # Finally load the label encoder
-        self.label_encoder = joblib.load(os.path.join('model', 'label_encoder.pkl'))
+        self.label_encoder = joblib.load(os.path.join('predictor', 'model', 'label_encoder.pkl'))
     
     def processDataset(self):
         print("Processing dataset...")
@@ -103,9 +103,9 @@ class MovieGenreClassifier:
         model = LogisticRegression(max_iter=100)  # You can adjust hyperparameters
         model.fit(X_train, y_train)
         self.trained_model = model
-        joblib.dump(model, os.path.join('model', 'trained_model.pkl'))
-        joblib.dump(self.vectorizer, os.path.join('model', 'tfidf_vectorizer.pkl'))
-        joblib.dump(self.label_encoder, os.path.join('model', 'label_encoder.pkl'))
+        joblib.dump(model, os.path.join('predictor', 'model', 'trained_model.pkl'))
+        joblib.dump(self.vectorizer, os.path.join('predictor', 'model', 'tfidf_vectorizer.pkl'))
+        joblib.dump(self.label_encoder, os.path.join('predictor', 'model', 'label_encoder.pkl'))
         return model
 
     def evaluateModel(self, model, X_test, y_test):
@@ -114,7 +114,7 @@ class MovieGenreClassifier:
         accuracy = accuracy_score(y_test, y_pred)
         print("Accuracy:", accuracy)
     
-    def predict_genre(self, input_plot):
+    def predict_genre(self, input_plot = "In this uproarious film a bachelor party in Las Vegas spirals into a wild and unforgettable adventure. When three friends wake up with no memory of the previous night, they must retrace their steps to find their missing groom-to-be. Hilarity ensues as they encounter eccentric characters, unexpected challenges, and a trail of chaos that threatens to derail the upcoming wedding. With the clock ticking, the trio races against time to piece together the puzzle of their night of debauchery. Filled with outrageous antics and laugh-out-loud moments, this film showcases the unpredictable nature of friendship and the joys of embracing the unexpected."):
         preprocessed_plot = self.preprocess_text(input_plot)
         tfidf_matrix = self.vectorizer.transform([preprocessed_plot]).toarray()
         encoded_genre = self.trained_model.predict(tfidf_matrix)[0]
@@ -123,7 +123,7 @@ class MovieGenreClassifier:
 
 if __name__ == "__main__":
     while True:
-        choice = input("Would you like to use your custom pnlot to test the model? (default is a comedy) Y/N \n")
+        choice = input("Would you like to use your custom plot to test the model? (default is a comedy) Y/N \n")
         if choice.upper() == 'Y' or choice.upper() == 'N':
             if choice.upper() == 'N':
                 plot = "In this uproarious film a bachelor party in Las Vegas spirals into a wild and unforgettable adventure. When three friends wake up with no memory of the previous night, they must retrace their steps to find their missing groom-to-be. Hilarity ensues as they encounter eccentric characters, unexpected challenges, and a trail of chaos that threatens to derail the upcoming wedding. With the clock ticking, the trio races against time to piece together the puzzle of their night of debauchery. Filled with outrageous antics and laugh-out-loud moments, this film showcases the unpredictable nature of friendship and the joys of embracing the unexpected."

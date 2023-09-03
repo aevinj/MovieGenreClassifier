@@ -5,11 +5,39 @@
 </head>
 <body>
     <h1>Welcome to the Movie Genre Classifier</h1>
-    <p>Enter a movie description to predict its genre:</p>
+    <p>Would you like to use your custom plot to test the model? (default is a comedy)</p>
     <form method="post" action="{% url 'predictor' %}">
         {% csrf_token %}
-        <input type="text" name="user_input">
+        <input type="checkbox" id="custom-plot" name="custom_plot_option">
+        <label for="custom-plot">Use custom plot</label>
+        <br>
+        <input type="text" name="user_input" placeholder="Enter your plot here" id="custom-plot-input" style="display:none;">
+        <span id="validation-message" style="color: red;"></span>
         <button type="submit">Predict Genre</button>
     </form>
+    <script>
+        const customPlotInput = document.getElementById('custom-plot-input');
+        const customPlotCheckbox = document.getElementById('custom-plot');
+        const validationMessage = document.getElementById('validation-message');
+    
+        customPlotCheckbox.addEventListener('change', function() {
+            customPlotInput.style.display = this.checked ? 'block' : 'none';
+            validationMessage.textContent = ''; // Clear any previous validation message
+        });
+    
+        document.querySelector('form').addEventListener('submit', function(event) {
+            if (customPlotCheckbox.checked) { // Check if the custom plot checkbox is checked
+                const userInput = customPlotInput.value.trim();
+                const wordCount = userInput.split(/\s+/).length;
+    
+                if (wordCount < 50) {
+                    event.preventDefault(); // Prevent form submission
+                    validationMessage.textContent = 'Please enter at least 50 words.';
+                    customPlotInput.focus(); // Set focus back to the input field
+                }
+            }
+        });
+    </script>
+    
 </body>
 </html>

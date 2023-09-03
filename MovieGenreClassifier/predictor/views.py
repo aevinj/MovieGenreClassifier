@@ -1,16 +1,16 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from .main import MovieGenreClassifier
 
 def predictor(request):
-    return HttpResponse("This is ur prediction lol.")
-
-def index(request):
     if request.method == 'POST':
-        user_input = request.POST.get('user_input')
-        # Load your pre-trained model and make predictions here
-        #predicted_genre = your_model.predict(user_input)
-        #return render(request, 'result.html', {'predicted_genre': predicted_genre})
-        print("hi")
-
-    #return render(request, 'index.html')
-    return HttpResponse("hi")
+        mgc = MovieGenreClassifier()
+        custom_plot_option = request.POST.get('custom_plot_option')
+        
+        if custom_plot_option == 'on':
+            result = mgc.predict_genre(request.POST.get('user_input'))
+        else:
+            result = mgc.predict_genre()
+        return render(request, 'result.html', {'result': result})
+    else:
+        return HttpResponse("something went wrong!")
